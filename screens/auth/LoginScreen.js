@@ -1,7 +1,8 @@
-import { View, Text, StyleSheet, TextInput, Pressable } from 'react-native';
+import { View, Text, StyleSheet, TextInput } from 'react-native';
 
 import { GlobalStyles } from '../../constants/style';
 import { auth } from "../../Firebase/FirebaseConfig"
+import Button from '../../components/UI/Button';
 
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
@@ -11,20 +12,19 @@ function LoginScreen() {
     const navigation = useNavigation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleLogin = async () => {
+        setIsLoading(true);
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            console.log('Login successful ✅');
-
-
-
 
         } catch (error) {
             alert(error.message);
+        } finally {
+            setIsLoading(false);
         }
     };
-
 
     return (
         <View style={styles.container}>
@@ -48,19 +48,19 @@ function LoginScreen() {
 
             <Text style={styles.link}>Forgot Password?</Text>
 
-            <Pressable style={styles.button} onPress={handleLogin}>
-                <Text style={styles.buttonText}>Login</Text>
-            </Pressable>
+            <Button onPress={handleLogin}>Login</Button>
+
 
             <Text style={styles.or}>or</Text>
 
-            <Pressable style={styles.outlineButton}>
-                <Text style={styles.outlineText}>Continue with Google</Text>
-            </Pressable>
+            <Button mode="flat" onPress={() => console.log("Continue with Google")}>
+                Continue with Google
+            </Button>
+
 
             <Text style={styles.bottomText}>
                 Don’t have an account?{' '}
-                <Text style={styles.link} onPress={() => navigation.navigate('Signup')}>Register</Text>
+                <Text style={styles.link} onPress={() => navigation.navigate('Signup')}>Sign up</Text>
             </Text>
         </View>
     );
@@ -97,32 +97,10 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         fontWeight: '600',
     },
-    button: {
-        backgroundColor: GlobalStyles.colors.primary500,
-        padding: 14,
-        borderRadius: 12,
-        alignItems: 'center',
-        marginBottom: 12,
-    },
-    buttonText: {
-        color: GlobalStyles.colors.white,
-        fontWeight: '600',
-    },
     or: {
         textAlign: 'center',
         marginVertical: 8,
         color: GlobalStyles.colors.textSecondary,
-    },
-    outlineButton: {
-        borderWidth: 1,
-        borderColor: GlobalStyles.colors.textPrimary,
-        padding: 14,
-        borderRadius: 12,
-        alignItems: 'center',
-    },
-    outlineText: {
-        color: GlobalStyles.colors.textPrimary,
-        fontWeight: '500',
     },
     bottomText: {
         textAlign: 'center',

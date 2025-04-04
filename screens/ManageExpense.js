@@ -42,6 +42,9 @@ function ManageExpense({ route, navigation }) {
                 }
             );
         } else {
+            if (expensesContext.expenses.length === 0) {
+                expensesContext.resetExpenses();
+            }
             expensesContext.addExpense({
                 description: 'Test',
                 amount: 99.99,

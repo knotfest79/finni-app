@@ -4,8 +4,7 @@ import RecentExpenses from '../screens/RecentExpenses';
 import AllExpenses from '../screens/AllExpenses';
 import Settings from '../screens/Settings';
 import Home from '../screens/Home';
-import LoginScreen from '../screens/auth/LoginScreen';
-import SignupScreen from '../screens/auth/SignupScreen';
+
 import { GlobalStyles } from '../constants/style';
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -44,17 +43,7 @@ function ExpensesOverview() {
             })}
         >
 
-            <BottomTabs.Screen
-                name="Home"
-                component={Home}
-                options={{
-                    headerShown: false,
-                    tabBarLabel: 'Home',
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="home" size={size} color={color} />
-                    ),
-                }}
-            />
+
             <BottomTabs.Screen
                 name="Recent Expenses"
                 component={RecentExpenses}
@@ -116,16 +105,7 @@ export default function AuthenticatedStack() {
                     presentation: 'modal',
                 }}
             />
-            <Stack.Screen
-                name="Login"
-                component={LoginScreen}
-                options={{ headerShown: false, presentation: 'modal' }}
-            />
-            <Stack.Screen
-                name="Signup"
-                component={SignupScreen}
-                options={{ headerShown: false, presentation: 'modal' }}
-            />
+
         </Stack.Navigator>
     );
 }

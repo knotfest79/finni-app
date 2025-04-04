@@ -1,5 +1,9 @@
-import { View, Text, StyleSheet, TextInput, Pressable } from 'react-native';
-import { updateProfile } from "firebase/auth"; // at the top of SignupScreen.js
+
+import { sendEmailVerification } from 'firebase/auth';
+
+import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { updateProfile } from "firebase/auth";
+import Button from '../../components/UI/Button';
 
 import { GlobalStyles } from '../../constants/style';
 import { auth } from "../../Firebase/FirebaseConfig"
@@ -18,22 +22,29 @@ function SignupScreen() {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-            // ✅ Update Firebase user profile with display name
-            await updateProfile(userCredential.user, {
-                displayName: name,
-            });
+            await updateProfile(userCredential.user, { displayName: name });
 
-            console.log("User registered and name saved ✅");
+            await sendEmailVerification(userCredential.user);
+            alert('Verification email sent. Please check your inbox.');
+
+
+            await auth.signOut();
+
+
+            navigation.replace('Login');
 
         } catch (error) {
+            console.error("Signup error:", error);
             alert(error.message);
         }
     };
 
 
+
+
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Register</Text>
+            <Text style={styles.title}>Sign up</Text>
             <Text style={styles.desc}>Create an account to access all the features of Finni!</Text>
 
             <TextInput
@@ -58,9 +69,7 @@ function SignupScreen() {
                 onChangeText={setPassword}
             />
 
-            <Pressable style={styles.button} onPress={handleSignup}>
-                <Text style={styles.buttonText}>Register</Text>
-            </Pressable>
+            <Button onPress={handleSignup}>Sign Up</Button>
 
             <Text style={styles.bottomText}>
                 Already have an account?{' '}

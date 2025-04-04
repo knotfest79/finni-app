@@ -55,6 +55,19 @@ const Dummy_Expenses = [{
     amount: 99.95,
     date: new Date('2024-02-26')
 },
+{
+    id: 'e9',
+    description: 'Burger 🍔',
+    amount: 11.99,
+    date: new Date(),
+},
+{
+    id: 'e10',
+    description: 'Coffee ☕',
+    amount: 4.99,
+    date: new Date(new Date().setDate(new Date().getDate() - 2)),
+}
+
 ]
 
 
@@ -87,6 +100,10 @@ function expenseReducer(state, action) {
         default:
             return state;
 
+        case 'Reset':
+            return [...Dummy_Expenses];
+
+
     }
 }
 
@@ -105,6 +122,9 @@ function ExpenseContextProvider({ children }) {
     function updateExpense(id, expenseData) {
         dispatch({ type: 'Update', payload: { id, data: expenseData } });
     }
+    function resetExpenses() {
+        dispatch({ type: 'Reset' });
+    }
 
 
     const value = {
@@ -112,6 +132,7 @@ function ExpenseContextProvider({ children }) {
         addExpense,
         deleteExpense,
         updateExpense,
+        resetExpenses,
     };
 
     return <ExpenseContext.Provider value={value}>{children}</ExpenseContext.Provider>
