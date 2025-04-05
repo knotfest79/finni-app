@@ -22,7 +22,11 @@ function ExpenseItem({ id, description, amount, date }) {
                     <Text style={styles.textBase}>{getFormattedDate(date)}</Text>
                 </View>
                 <View style={styles.amountContainer}>
-                    <Text style={styles.amount}>{amount.toFixed(2)}</Text>
+                    <Text style={styles.amount}>
+                        {typeof amount === 'number' && !isNaN(amount) ? amount.toFixed(2) : '0.00'}
+                    </Text>
+
+
                 </View>
             </View>
         </Pressable>

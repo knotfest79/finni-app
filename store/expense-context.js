@@ -85,14 +85,34 @@ function expenseReducer(state, action) {
         case 'Add':
             const id = new Date().toString() + Math.random().toString();
 
-            return [{ ...action.payload, id: id }, ...state]
+            const payload = action.payload;
+
+            const newExpense = {
+                id: id,
+                description: payload.description,
+                amount: parseFloat(payload.amount),
+                date: payload.date,
+
+            };
+
+            return [newExpense, ...state];
+
         case 'Update':
             const updatableExpenseIndex = state.findIndex((expense) => expense.id === action.payload.id);
             const updatableExpense = state[updatableExpenseIndex];
-            const updatedItem = { ...updatableExpense, ...action.payload.data };
+            const data = action.payload.data;
+
+            const updatedItem = {
+                ...updatableExpense,
+                description: data.description,
+                amount: parseFloat(data.amount),
+                date: data.date, // ✅ Already a Date object
+            };
+
             const updatedExpenses = [...state];
             updatedExpenses[updatableExpenseIndex] = updatedItem;
             return updatedExpenses;
+
 
 
         case 'Delete':
