@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import Input from "./Input";
 import { GlobalStyles } from "../../constants/style";
 import { useState } from "react";
-import { getFormattedDate } from "../../util/date";
+import { getFormattedDate, normalizeDateInput } from "../../util/date";
 
 import Button from "../UI/Button";
 
@@ -24,7 +24,9 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
     }
 
     function SubmitHandler() {
-        const { amount, date, description } = inputValues;
+        const { amount, date: rawdate, description } = inputValues;
+
+        const date = normalizeDateInput(rawdate);
 
         //  Check empty values
         if (!amount || !date || !description) {
@@ -32,9 +34,24 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
             return;
         }
 
-        // Parse DD-MM-YYYY
+        //Validating fields before using expenseData
+        const amountISValid = !isNaN(amount) && parseFloat(amount) > 0;
+        const descriptionIsValid = description.trim().length > 0;
+        const dateIsValid = /^\d{2}-\d{2}-\d{4}$/.test(date);
+
+
         const [day, month, year] = date.split('-');
-        const parsedDate = new Date(`${year}-${month}-${day}`);
+        const parsedDate = new Date(`${year}-${month}-${day}`);   // Parse DD-MM-YYYY
+
+
+
+        if (!amountISValid || !dateIsValid || !descriptionIsValid) {
+            Alert.alert('Inavlid input', 'Please check your input values');
+            return;
+        }
+
+
+
 
         if (isNaN(parsedDate.getTime())) {
             alert('Invalid date. Please use format: DD-MM-YYYY');
@@ -44,7 +61,7 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
         const expenseData = {
             amount: parseFloat(amount),
             date: parsedDate,
-            description: description,
+            description: description.trim(),
         };
 
         onSubmit(expenseData);

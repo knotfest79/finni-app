@@ -16,3 +16,18 @@ export function getDateMinusDays(date, days) {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate() - days);
 }
 
+// date.js
+export function normalizeDateInput(input) {
+    const cleaned = input.replace(/\D/g, '');
+
+    if (cleaned.length === 8) {
+        return `${cleaned.slice(0, 2)}-${cleaned.slice(2, 4)}-${cleaned.slice(4, 8)}`;
+    }
+
+    if (cleaned.length === 6) {
+        return `${cleaned.slice(0, 2)}-${cleaned.slice(2, 4)}-20${cleaned.slice(4, 6)}`;
+    }
+
+    return input; // fallback
+}
+
