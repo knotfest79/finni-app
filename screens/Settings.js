@@ -6,6 +6,7 @@ import { auth } from '../Firebase/FirebaseConfig';
 import { signOut } from 'firebase/auth';
 import { ExpenseContext } from '../store/expense-context';
 import { useContext } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 function Settings() {
     const { theme, toggleTheme } = useTheme();
     const colors = GlobalStyles[theme];
@@ -28,7 +29,7 @@ function Settings() {
     return (
 
 
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
 
 
             <Text style={[styles.header, { color: colors.textPrimary }]}>Settings</Text>
@@ -51,7 +52,7 @@ function Settings() {
                 <Text style={[styles.logoutText, { color: colors.textPrimary }]}>Logout</Text>
             </Pressable>
 
-        </View >
+        </SafeAreaView >
     );
 }
 

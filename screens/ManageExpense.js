@@ -1,14 +1,17 @@
-import { useContext, useLayoutEffect } from "react";
+import { useContext, useLayoutEffect, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 import IconButton from "../components/UI/IconButton";
 import { GlobalStyles } from "../constants/style";
-import Button from "../components/UI/Button";
+// import Button from "../components/UI/Button";
 import { ExpenseContext } from "../store/expense-context";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
+import { storeExpense, updateExpense, deleteExpense } from "../util/http";
+import LoadOverlayatStart from "../components/UI/LoadOverlayatStart";
+
 
 
 function ManageExpense({ route, navigation }) {
-
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const expensesContext = useContext(ExpenseContext);
 
     const expenseIdEdit = route.params?.expenseId;
@@ -24,7 +27,10 @@ function ManageExpense({ route, navigation }) {
 
     }, [navigation, isEditing]);
 
-    function deleteExpenseHandler() {
+    async function deleteExpenseHandler() {
+        setIsSubmitting(true);
+        await deleteExpense(expenseIdEdit);
+
         expensesContext.deleteExpense(expenseIdEdit);
         navigation.goBack();
 
@@ -34,22 +40,29 @@ function ManageExpense({ route, navigation }) {
     function cancelHandler() {
         navigation.goBack();
     }
-    function confirmHandler(expenseData) {
+
+
+    async function confirmHandler(expenseData) {
+        setIsSubmitting(true);
         if (isEditing) {
             expensesContext.updateExpense(
                 expenseIdEdit,
                 expenseData,
             );
+            await updateExpense(expenseIdEdit, expenseData);
         } else {
+            const id = await storeExpense(expenseData);
             if (expensesContext.expenses.length === 0) {
-                expensesContext.resetExpenses();
+                // expensesContext.resetExpenses();
             }
-            expensesContext.addExpense(expenseData);
+            expensesContext.addExpense({ ...expenseData, id: id });
         }
         navigation.goBack();
     }
 
-
+    if (isSubmitting) {
+        return <LoadOverlayatStart />
+    }
     return <View style={styles.container}>
 
         <ExpenseForm submitButtonLabel={

@@ -7,6 +7,7 @@ import Button from '../../components/UI/Button';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 function LoginScreen() {
     const navigation = useNavigation();
@@ -27,7 +28,7 @@ function LoginScreen() {
     };
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <Text style={styles.title}>Login</Text>
             <Text style={styles.desc}>Login now to track all your expenses and income at a place!</Text>
 
@@ -62,7 +63,7 @@ function LoginScreen() {
                 Don’t have an account?{' '}
                 <Text style={styles.link} onPress={() => navigation.navigate('Signup')}>Sign up</Text>
             </Text>
-        </View>
+        </SafeAreaView>
     );
 }
 

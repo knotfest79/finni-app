@@ -3,6 +3,7 @@ import { GlobalStyles } from '../constants/style';
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 
@@ -11,7 +12,7 @@ function Home() {
     const navigation = useNavigation();
 
     return (
-        <View style={[styles.container, { flex: 1 }]}>
+        <SafeAreaView style={[styles.container, { flex: 1 }]}>
             <View style={styles.topSection}>
                 <Image source={require('../assets/finni.png')} style={styles.logoImage} />
                 <Text style={styles.welcome}>Welcome to</Text>
@@ -37,7 +38,7 @@ function Home() {
                     Login
                 </Text>
             </Text>
-        </View>
+        </SafeAreaView>
     );
 
 }

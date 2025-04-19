@@ -10,6 +10,7 @@ import { auth } from "../../Firebase/FirebaseConfig"
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 function SignupScreen() {
@@ -43,7 +44,7 @@ function SignupScreen() {
 
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <Text style={styles.title}>Sign up</Text>
             <Text style={styles.desc}>Create an account to access all the features of Finni!</Text>
 
@@ -75,7 +76,7 @@ function SignupScreen() {
                 Already have an account?{' '}
                 <Text style={styles.link} onPress={() => navigation.navigate('Login')}>Login</Text>
             </Text>
-        </View>
+        </SafeAreaView>
     );
 }
 

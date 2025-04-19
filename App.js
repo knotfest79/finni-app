@@ -8,6 +8,9 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./Firebase/FirebaseConfig";
 import ExpenseContextProvider from "./store/expense-context";
 import SplashScreen from "./components/SplashScreen"; // if you're using one
+import { SafeAreaProvider } from "react-native-safe-area-context";
+
+
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -37,10 +40,12 @@ export default function App() {
   return (
     <ThemeProvider>
       <ExpenseContextProvider>
-        <StatusBar style="auto" />
-        <NavigationContainer>
-          {user ? <AuthenticatedStack /> : <UnauthenticatedStack />}
-        </NavigationContainer>
+        <SafeAreaProvider>
+          <StatusBar style="auto" />
+          <NavigationContainer>
+            {user ? <AuthenticatedStack /> : <UnauthenticatedStack />}
+          </NavigationContainer>
+        </SafeAreaProvider>
       </ExpenseContextProvider>
     </ThemeProvider>
   );

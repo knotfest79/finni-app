@@ -3,58 +3,65 @@ import Input from "./Input";
 import { GlobalStyles } from "../../constants/style";
 import { useState } from "react";
 import { getFormattedDate, normalizeDateInput } from "../../util/date";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
+import { Platform } from "react-native";
 import Button from "../UI/Button";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
 
     const [inputValues, setInputValues] = useState({
-        amount: defaultValues ? defaultValues.amount.toString() : '',
-        date: defaultValues ? getFormattedDate(defaultValues.date) : '',
-        description: defaultValues ? defaultValues.description : '',
+        amount: { value: defaultValues ? defaultValues.amount.toString() : '', isValid: true },
+        date: { value: defaultValues ? getFormattedDate(defaultValues.date) : '', isValid: true },
+        description: { value: defaultValues ? defaultValues.description : '', isValid: true },
     });
 
     function inputChangeHandler(inputIdentifier, enteredValue) {
+        const normalized =
+            inputIdentifier === 'date' ? normalizeDateInput(enteredValue) : enteredValue;
+
         setInputValues((curr) => {
             return {
                 ...curr,
-                [inputIdentifier]: enteredValue
+                [inputIdentifier]: { value: normalized, isValid: true },
             };
         });
     }
 
+
+
     function SubmitHandler() {
-        const { amount, date: rawdate, description } = inputValues;
+        const amount = inputValues.amount.value;
+        const rawdate = inputValues.date.value;
+        const description = inputValues.description.value;
 
-        const date = normalizeDateInput(rawdate);
 
-        //  Check empty values
+        const date = rawdate;
+
         if (!amount || !date || !description) {
-            alert('Please fill in all fields');
+            setInputValues((curr) => ({
+                amount: { value: curr.amount.value, isValid: amountIsValid },
+                description: { value: curr.description.value, isValid: descriptionIsValid },
+                date: { value: curr.date.value, isValid: dateIsValid && !isNaN(parsedDate.getTime()) },
+            }));
+
             return;
         }
 
-        //Validating fields before using expenseData
-        const amountISValid = !isNaN(amount) && parseFloat(amount) > 0;
+        const amountIsValid = !isNaN(amount) && parseFloat(amount) > 0;
         const descriptionIsValid = description.trim().length > 0;
         const dateIsValid = /^\d{2}-\d{2}-\d{4}$/.test(date);
 
-
         const [day, month, year] = date.split('-');
-        const parsedDate = new Date(`${year}-${month}-${day}`);   // Parse DD-MM-YYYY
+        const parsedDate = new Date(`${year}-${month}-${day}`);
 
-
-
-        if (!amountISValid || !dateIsValid || !descriptionIsValid) {
-            Alert.alert('Inavlid input', 'Please check your input values');
-            return;
-        }
-
-
-
-
-        if (isNaN(parsedDate.getTime())) {
-            alert('Invalid date. Please use format: DD-MM-YYYY');
+        if (!amountIsValid || !descriptionIsValid || !dateIsValid || isNaN(parsedDate.getTime())) {
+            setInputValues((curr) => ({
+                amount: { value: curr.amount.value, isValid: amountIsValid },
+                description: { value: curr.description.value, isValid: descriptionIsValid },
+                date: { value: curr.date.value, isValid: dateIsValid && !isNaN(parsedDate.getTime()) },
+            }));
             return;
         }
 
@@ -67,43 +74,77 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
         onSubmit(expenseData);
     }
 
+    function handleDateFieldPress() {
+        setShowDatePicker((prev) => !prev);
+    }
+
+    const [showDatePicker, setShowDatePicker] = useState(false);
+
+    function handleDateChange(event, selectedDate) {
+        if (Platform.OS === 'android') {
+            setShowDatePicker(false);
+        }
+
+        if (selectedDate) {
+            const formatted = getFormattedDate(selectedDate); // returns DD-MM-YYYY
+            setInputValues((curr) => ({
+                ...curr,
+                date: { value: formatted, isValid: true },
+            }));
+            console.log('Selected Date:', formatted);
+        }
+    }
+
+
+
+
+
 
 
     return (
-        <View style={styles.form}>
+        <SafeAreaView style={styles.form}>
             <Text style={styles.textContainer}>Your Expense Summary 💰</Text>
 
             <View style={styles.inputRowContainer}>
                 <Input
                     style={styles.rowInput}
                     label="Amount"
+                    isInvalid={!inputValues.amount.isValid}
                     textInputConfig={{
                         keyboardType: "decimal-pad",
                         placeholder: "Enter Amount",
                         onChangeText: inputChangeHandler.bind(this, 'amount'),
-                        value: inputValues.amount,
+                        value: inputValues.amount.value,
                     }}
                 />
                 <Input
                     style={styles.rowInput}
                     label="Date"
+                    isInvalid={!inputValues.date.isValid}
                     textInputConfig={{
                         placeholder: "DD-MM-YYYY",
+                        value: inputValues.date.value,
+                        editable: true,
                         maxLength: 10,
                         onChangeText: inputChangeHandler.bind(this, 'date'),
-                        value: inputValues.date,
                     }}
+                    onPress={handleDateFieldPress}
                 />
+
+
+
+
             </View>
 
             <Input
                 label="Description"
+                isInvalid={!inputValues.description.isValid}
                 textInputConfig={{
                     multiline: true,
                     numberOfLines: 4,
                     placeholder: "Enter description",
                     onChangeText: inputChangeHandler.bind(this, 'description'),
-                    value: inputValues.description,
+                    value: inputValues.description.value,
                 }}
             />
 
@@ -111,8 +152,23 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
                 <Button style={styles.button} mode="flat" onPress={onCancel}>Cancel</Button>
                 <Button style={styles.button} onPress={SubmitHandler}>{submitButtonLabel}</Button>
 
+
             </View>
-        </View>
+            {showDatePicker && (
+                <DateTimePicker
+                    value={
+                        typeof inputValues.date?.value === 'string' && inputValues.date.value.includes('-')
+                            ? new Date(inputValues.date.value.split('-').reverse().join('-'))
+                            : new Date()
+                    }
+
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'} // ✅ fixed here
+                    onChange={handleDateChange}
+                />
+            )}
+
+        </SafeAreaView>
     );
 }
 
@@ -122,6 +178,7 @@ export default ExpenseForm;
 const styles = StyleSheet.create({
     form: {
         marginTop: 20,
+        paddingBottom: 120,
     },
     inputRowContainer: {
         flexDirection: 'row',
