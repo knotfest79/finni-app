@@ -3,6 +3,21 @@ import { firestore } from '../Firebase/FirebaseConfig';
 
 const expensesCollection = collection(firestore, 'expenses');
 
+
+function safeParseDate(input) {
+    if (!input) return new Date(NaN);
+    if (input instanceof Date) return input;
+    if (typeof input.toDate === 'function') return input.toDate();
+
+    if (typeof input === 'string') {
+        const [day, month, year] = input.split('-').map(Number);
+        if (!day || !month || !year) return new Date(NaN);
+        return new Date(year, month - 1, day);
+    }
+
+    return new Date(NaN);
+}
+
 export async function storeExpense(expenseData) {
     try {
         const docRef = await addDoc(expensesCollection, expenseData);
@@ -21,7 +36,7 @@ export async function fetchExpenses() {
             return {
                 id: doc.id,
                 amount: data.amount,
-                date: new Date(data.date),
+                date: safeParseDate(data.date),
                 description: data.description,
             };
         });
